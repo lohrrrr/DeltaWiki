@@ -11,7 +11,20 @@ DIST_DIR = BASE_DIR / "dist"
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 
+def fake_url_for(endpoint, **values):
+    if endpoint == "static":
+        filename = values.get("filename", "")
+        return f"/static/{filename}"
+    if endpoint == "community_theme":
+        community = values.get("community", "")
+        return f"/community_static/{community}/theme.css"
+    if endpoint == "page_view":
+        subpath = values.get("subpath", "")
+        return f"/page/{subpath}"
+    return "/"
+
 env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
+env.globals["url_for"] = fake_url_for
 template = env.get_template("page.html")
 
 def build_tree(dir_path: Path, base_path: Path):

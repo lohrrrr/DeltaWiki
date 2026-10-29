@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}Community Wiki{% endblock %}</title>
+  <title>{% block title %}DeltaWiki{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
   {% if custom_theme %}
   <link rel="stylesheet" href="{{ custom_theme }}">
@@ -12,19 +12,20 @@
 
   <header class="wiki-header">
     <div class="wiki-logo">
-      <a href="/"><b>Open</b>WIKI</a>
+      <a href="/"><b>Delta</b>WIKI</a>
     </div>
     <div class="wiki-tabs">
-      <span class="tab active">Article</span>
-      <a href="https://github.com/lohrrrr/OpenWiki" target="_blank" class="tab edit-tab">OpenWIKI github</a> <!-- You can change this link to anything -->
+      <span class="tab active">Статья</span>
+      <a href="https://github.com/lohrrrr/DeltaWiki/" target="_blank" class="tab edit-tab">DeltaWiki GitHub</a>
+      <a href="https://github.com/lohrrrr/OpenWiki" target="_blank" class="tab edit-tab">OpenWIKI</a>
     </div>
   </header>
 
   <div class="wiki-layout">
-    <!-- Left sidebar -->
+    <!-- Левая панель -->
     <aside class="sidebar">
       <div class="sidebar-box">
-        <div class="sidebar-title">NAVIGATION</div>
+        <div class="sidebar-title">НАВИГАЦИЯ</div>
         <nav class="sidebar-nav">
           {% macro render_node(nodes) %}
             <ul>
@@ -48,11 +49,8 @@
       </div>
     </aside>
 
-    <!-- Main content -->
+    <!-- Основной контент (без автоматического title вверху) -->
     <main class="content-wrapper">
-      <div class="page-title-bar">
-        <h1>{{ title }}</h1>
-      </div>
       <article class="markdown-body">
         {% block content %}{% endblock %}
       </article>

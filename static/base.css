@@ -1,39 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 :root {
-  --bg-color: #F6F6F6;
+  --bg-color: #F8F6F6;
   --content-bg: #FFFFFF;
-  --border-color: #A7D7F9;
-  --olive-dark: #556B2F;
-  --olive-light: #F4F5E8;
-  --wiki-blue: #0645AD;
-  --wiki-blue-visited: #0B0080;
+  --border-color: #E2B6B6;
+  --crimson-dark: #8B1E1E;
+  --crimson-header-start: #B22222;
+  --crimson-light: #FBF0F0;
+  --sidebar-border: #D69898;
+  --wiki-link: #A11B1B;
+  --wiki-link-hover: #5A0E0E;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif, 'Helvetica Neue', 'Segoe UI';
+  font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif;
   font-size: 14px;
   background-color: var(--bg-color);
   color: #202122;
 }
 
 .wiki-header {
-  background: linear-gradient(to bottom, #8A9A5B, #556B2F);
+  background: linear-gradient(to bottom, var(--crimson-header-start), var(--crimson-dark));
   display: flex;
   align-items: flex-end;
   padding: 0 20px;
   height: 50px;
-  border-bottom: 1px solid #4B5320;
+  border-bottom: 2px solid #5A0E0E;
 }
 
 .wiki-logo a {
-  color: white;
+  color: #FFFFFF;
   text-decoration: none;
   font-size: 1.3em;
   padding-bottom: 10px;
   display: inline-block;
   margin-right: 30px;
-  text-shadow: 1px 1px 2px #000;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.5px;
 }
 
 .wiki-tabs {
@@ -42,21 +47,27 @@ body {
 }
 
 .wiki-tabs .tab {
-  background: #EFEFE4;
-  border: 1px solid #ACA899;
+  background: #F4EBEB;
+  border: 1px solid #C4A4A4;
   border-bottom: none;
   padding: 6px 15px;
   font-size: 0.85em;
-  color: #333;
+  color: #4A3535;
   text-decoration: none;
   border-radius: 4px 4px 0 0;
+  transition: background 0.15s ease;
+}
+
+.wiki-tabs .tab:hover {
+  background: #FFFFFF;
+  color: var(--crimson-dark);
 }
 
 .wiki-tabs .tab.active {
-  background: white;
+  background: #FFFFFF;
   font-weight: bold;
-  border-color: #ACA899;
-  color: #000;
+  border-color: #C4A4A4;
+  color: var(--crimson-dark);
 }
 
 .wiki-layout {
@@ -68,23 +79,23 @@ body {
 }
 
 .sidebar {
-  width: 250px;
+  width: 260px;
   flex-shrink: 0;
 }
 
 .sidebar-box {
-  background-color: var(--olive-light);
-  border: 1px solid #BDB76B;
-  padding: 8px;
-  border-radius: 2px;
+  background-color: var(--crimson-light);
+  border: 1px solid var(--sidebar-border);
+  padding: 10px;
+  border-radius: 3px;
 }
 
 .sidebar-title {
   font-size: 0.75em;
   font-weight: bold;
-  color: #555;
-  border-bottom: 1px solid #BDB76B;
-  padding-bottom: 3px;
+  color: var(--crimson-dark);
+  border-bottom: 1px solid var(--sidebar-border);
+  padding-bottom: 4px;
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -102,12 +113,13 @@ body {
 
 .folder-title {
   display: block;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 0.9em;
-  color: #2E3310;
+  color: #3B1414;
   cursor: pointer;
   padding: 3px 0 3px 18px;
   position: relative;
+  user-select: none;
 }
 
 .folder-title::before {
@@ -116,7 +128,7 @@ body {
   left: 2px;
   font-size: 0.7em;
   top: 4px;
-  color: var(--olive-dark);
+  color: var(--crimson-dark);
 }
 
 .folder-node.expanded > .folder-title::before {
@@ -128,87 +140,102 @@ body {
 }
 
 .file-node a {
-  color: var(--wiki-blue);
+  color: var(--wiki-link);
   text-decoration: none;
   font-size: 0.88em;
   display: block;
-  padding: 2px 0;
+  padding: 3px 0;
 }
 
 .file-node a:hover {
   text-decoration: underline;
+  color: var(--wiki-link-hover);
 }
 
 .file-node a.active-page {
   font-weight: bold;
-  color: #000;
+  color: #111;
 }
 
 .content-wrapper {
   flex-grow: 1;
   background: var(--content-bg);
-  border: 1px solid #A7D7F9;
+  border: 1px solid var(--border-color);
   padding: 25px 35px;
   min-height: 80vh;
-  box-shadow: 0 0 5px rgba(0,0,0,0.05);
-}
-
-.page-title-bar h1 {
-  font-family: 'Linux Libertine', 'Georgia', 'Times', serif;
-  font-size: 1.8em;
-  font-weight: normal;
-  border-bottom: 1px solid #a2a9b1;
-  margin: 0 0 15px 0;
-  padding-bottom: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .markdown-body {
   line-height: 1.6;
 }
 
+.markdown-body h1 {
+  font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif;
+  font-size: 1.85em;
+  font-weight: bold;
+  border-bottom: 1px solid #DDB8B8;
+  margin: 0 0 15px 0;
+  padding-bottom: 6px;
+  color: #1A1A1A;
+}
+
 .markdown-body h2 {
-  font-family: 'Linux Libertine', 'Georgia', serif;
-  font-weight: normal;
+  font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif;
+  font-weight: bold;
   font-size: 1.4em;
-  border-bottom: 1px solid #a2a9b1;
-  padding-bottom: 3px;
+  border-bottom: 1px solid #E2CACA;
+  padding-bottom: 4px;
   margin-top: 1.5em;
+  color: #2E1515;
 }
 
 .markdown-body h3 {
-  font-size: 1.1em;
+  font-size: 1.15em;
   margin-top: 1.2em;
+  color: #381A1A;
 }
 
 .markdown-body a {
-  color: var(--wiki-blue);
+  color: var(--wiki-link);
   text-decoration: none;
 }
 
 .markdown-body a:hover {
   text-decoration: underline;
+  color: var(--wiki-link-hover);
 }
 
 .markdown-body blockquote {
-  background-color: #f8f9fa;
-  border-left: 4px solid var(--olive-dark);
+  background-color: #FCF7F7;
+  border-left: 4px solid var(--crimson-dark);
   margin: 1em 0;
   padding: 10px 15px;
   font-size: 0.95em;
+  color: #4A3838;
 }
 
 .markdown-body table {
   border-collapse: collapse;
-  background-color: #f8f9fa;
+  background-color: #FFFFFF;
   margin: 1em 0;
+  width: auto;
 }
 
 .markdown-body th, .markdown-body td {
-  border: 1px solid #a2a9b1;
+  border: 1px solid #D6BCBC;
   padding: 6px 12px;
 }
 
 .markdown-body th {
-  background-color: #eaecf0;
+  background-color: #F8EBEB;
   text-align: center;
+  font-weight: 600;
+  color: #3B1B1B;
+}
+
+.markdown-body hr {
+  border: none;
+  border-top: 1px solid #E8CECE;
+  margin: 1.5em 0;
 }

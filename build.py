@@ -1,13 +1,18 @@
 import os
 import re
+import shutil
 from pathlib import Path
-from flask import Flask, render_template, abort, send_from_directory
+from jinja2 import Environment, FileSystemLoader
 import markdown2
-
-app = Flask(__name__)
 
 BASE_DIR = Path(__file__).parent
 PAGES_DIR = BASE_DIR / "pages"
+DIST_DIR = BASE_DIR / "dist"
+TEMPLATES_DIR = BASE_DIR / "templates"
+STATIC_DIR = BASE_DIR / "static"
+
+env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
+template = env.get_template("page.html")
 
 def build_tree(dir_path: Path, base_path: Path):
     tree = []
@@ -31,7 +36,7 @@ def build_tree(dir_path: Path, base_path: Path):
         file_full_path = dir_path / file
         rel_path = file_full_path.relative_to(base_path).as_posix()
         url_path = str(Path(rel_path).with_suffix(""))
-        
+
         tree.append({
             "type": "file",
             "name": file.replace(".md", "").replace("_", " "),
@@ -52,25 +57,19 @@ def parse_wiki_links(html_content: str) -> str:
         return f'<a href="/page/{target}">{label.strip()}</a>'
     return re.sub(pattern, replace, html_content)
 
-@app.route('/')
-def index():
-    return page_view('README')
-
-@app.route('/page/<path:subpath>')
-def page_view(subpath):
+def render_page(subpath: str, sidebar_tree: list) -> str:
     file_path = PAGES_DIR / f"{subpath}.md"
-    
     if not file_path.exists() and (PAGES_DIR / subpath).is_dir():
         file_path = PAGES_DIR / subpath / "index.md"
 
     if not file_path.exists():
-        abort(404)
+        return None
 
     with open(file_path, "r", encoding="utf-8") as f:
         raw_md = f.read()
 
     html_content = markdown2.markdown(
-        raw_md, 
+        raw_md,
         extras=["fenced-code-blocks", "tables", "header-ids", "strike", "task_lists"]
     )
     html_content = parse_wiki_links(html_content)
@@ -83,22 +82,42 @@ def page_view(subpath):
         if theme_path.exists():
             custom_theme = f"/community_static/{community_name}/theme.css"
 
-    sidebar_tree = build_tree(PAGES_DIR, PAGES_DIR)
-
-    return render_template(
-        "page.html",
+    return template.render(
         content=html_content,
         tree=sidebar_tree,
         title=Path(subpath).name.replace("_", " "),
         custom_theme=custom_theme
     )
 
-@app.route('/community_static/<community>/theme.css')
-def community_theme(community):
-    community_dir = PAGES_DIR / community
-    if (community_dir / "theme.css").exists():
-        return send_from_directory(community_dir, "theme.css")
-    abort(404)
+def main():
+    if DIST_DIR.exists():
+        shutil.rmtree(DIST_DIR)
+    DIST_DIR.mkdir(parents=True, exist_ok=True)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    if STATIC_DIR.exists():
+        shutil.copytree(STATIC_DIR, DIST_DIR / "static")
+
+    sidebar_tree = build_tree(PAGES_DIR, PAGES_DIR)
+
+    for theme_file in PAGES_DIR.glob("*/theme.css"):
+        community_name = theme_file.parent.name
+        dest_dir = DIST_DIR / "community_static" / community_name
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy(theme_file, dest_dir / "theme.css")
+
+    for md_file in PAGES_DIR.rglob("*.md"):
+        rel_path = md_file.relative_to(PAGES_DIR).as_posix()
+        subpath = str(Path(rel_path).with_suffix(""))
+
+        rendered = render_page(subpath, sidebar_tree)
+        if rendered:
+            out_file = DIST_DIR / "page" / subpath / "index.html"
+            out_file.parent.mkdir(parents=True, exist_ok=True)
+            out_file.write_text(rendered, encoding="utf-8")
+
+    root_html = render_page("README", sidebar_tree) or render_page("index", sidebar_tree)
+    if root_html:
+        (DIST_DIR / "index.html").write_text(root_html, encoding="utf-8")
+
+if __name__ == "__main__":
+    main()

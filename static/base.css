@@ -1,12 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-
 :root {
-  --bg-color: #F8F6F6;
+  --bg-color: #F4F1F1;
   --content-bg: #FFFFFF;
-  --border-color: #E2B6B6;
-  --crimson-dark: #8B1E1E;
-  --crimson-header-start: #B22222;
-  --crimson-light: #FBF0F0;
+  --border-color: #D9A8A8;
+  --crimson-dark: #801212;
+  --crimson-header-start: #9E1B1B;
+  --crimson-light: #FBF4F4;
   --sidebar-border: #D69898;
   --wiki-link: #A11B1B;
   --wiki-link-hover: #5A0E0E;
@@ -15,19 +13,31 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif;
+  font-family: sans-serif, 'Helvetica Neue', 'Segoe UI';
   font-size: 14px;
   background-color: var(--bg-color);
+  background-image: linear-gradient(180deg, #ECE5E5 0%, var(--bg-color) 200px);
   color: #202122;
 }
 
 .wiki-header {
-  background: linear-gradient(to bottom, var(--crimson-header-start), var(--crimson-dark));
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.22) 0%,
+                              rgba(255, 255, 255, 0.05) 49%,
+                              rgba(0, 0, 0, 0.08) 50%,
+                              rgba(0, 0, 0, 0.18) 100%
+  ),
+  linear-gradient(to bottom, var(--crimson-header-start), var(--crimson-dark));
   display: flex;
   align-items: flex-end;
   padding: 0 20px;
   height: 50px;
-  border-bottom: 2px solid #5A0E0E;
+  border-bottom: 1px solid #4D0909;
+  box-shadow:
+  inset 0 1px 0 rgba(255, 255, 255, 0.35),
+  0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
 .wiki-logo a {
@@ -37,44 +47,49 @@ body {
   padding-bottom: 10px;
   display: inline-block;
   margin-right: 30px;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
   letter-spacing: 0.5px;
 }
 
 .wiki-tabs {
   display: flex;
-  gap: 5px;
+  gap: 4px;
 }
 
 .wiki-tabs .tab {
-  background: #F4EBEB;
-  border: 1px solid #C4A4A4;
+  position: relative;
+  background: linear-gradient(180deg, #FDFBFB 0%, #E8DFDF 100%);
+  border: 1px solid #B89696;
   border-bottom: none;
   padding: 6px 15px;
   font-size: 0.85em;
   color: #4A3535;
   text-decoration: none;
   border-radius: 4px 4px 0 0;
-  transition: background 0.15s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: all 0.15s ease;
 }
 
 .wiki-tabs .tab:hover {
-  background: #FFFFFF;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F2E8E8 100%);
   color: var(--crimson-dark);
 }
 
 .wiki-tabs .tab.active {
-  background: #FFFFFF;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAF6F6 100%);
   font-weight: bold;
-  border-color: #C4A4A4;
+  border-color: #B89696;
   color: var(--crimson-dark);
+  box-shadow:
+  inset 0 1px 0 #FFFFFF,
+  0 -1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .wiki-layout {
   display: flex;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 15px 20px;
+  padding: 18px 20px;
   gap: 20px;
 }
 
@@ -84,10 +99,13 @@ body {
 }
 
 .sidebar-box {
-  background-color: var(--crimson-light);
+  background: linear-gradient(180deg, #FFF9F9 0%, var(--crimson-light) 100%);
   border: 1px solid var(--sidebar-border);
   padding: 10px;
-  border-radius: 3px;
+  border-radius: 4px;
+  box-shadow:
+  inset 0 1px 0 rgba(255, 255, 255, 0.8),
+  0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .sidebar-title {
@@ -161,9 +179,12 @@ body {
   flex-grow: 1;
   background: var(--content-bg);
   border: 1px solid var(--border-color);
+  border-radius: 4px;
   padding: 25px 35px;
   min-height: 80vh;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow:
+  inset 0 1px 0 rgba(255, 255, 255, 0.9),
+  0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .markdown-body {
@@ -171,9 +192,9 @@ body {
 }
 
 .markdown-body h1 {
-  font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif;
+  font-family: 'Linux Libertine', 'Georgia', 'Times', serif;
   font-size: 1.85em;
-  font-weight: bold;
+  font-weight: normal;
   border-bottom: 1px solid #DDB8B8;
   margin: 0 0 15px 0;
   padding-bottom: 6px;
@@ -181,8 +202,8 @@ body {
 }
 
 .markdown-body h2 {
-  font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif;
-  font-weight: bold;
+  font-family: 'Linux Libertine', 'Georgia', serif;
+  font-weight: normal;
   font-size: 1.4em;
   border-bottom: 1px solid #E2CACA;
   padding-bottom: 4px;
@@ -207,8 +228,10 @@ body {
 }
 
 .markdown-body blockquote {
-  background-color: #FCF7F7;
+  background: linear-gradient(180deg, #FDF9F9 0%, #F7EEEE 100%);
+  border: 1px solid #ECCECE;
   border-left: 4px solid var(--crimson-dark);
+  border-radius: 2px;
   margin: 1em 0;
   padding: 10px 15px;
   font-size: 0.95em;
@@ -220,6 +243,7 @@ body {
   background-color: #FFFFFF;
   margin: 1em 0;
   width: auto;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .markdown-body th, .markdown-body td {
@@ -228,14 +252,16 @@ body {
 }
 
 .markdown-body th {
-  background-color: #F8EBEB;
+  background: linear-gradient(180deg, #FCF4F4 0%, #EEDCDC 100%);
   text-align: center;
   font-weight: 600;
   color: #3B1B1B;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .markdown-body hr {
   border: none;
-  border-top: 1px solid #E8CECE;
+  height: 1px;
+  background: linear-gradient(to right, #E8CECE, #FAF1F1);
   margin: 1.5em 0;
 }

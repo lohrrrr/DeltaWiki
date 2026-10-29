@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import unicodedata
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 import markdown2
@@ -13,19 +14,21 @@ STATIC_DIR = BASE_DIR / "static"
 
 def fake_url_for(endpoint, **values):
     if endpoint == "static":
-        filename = values.get("filename", "")
-        return f"/static/{filename}"
+        return f"/static/{values.get('filename', '')}"
     if endpoint == "community_theme":
-        community = values.get("community", "")
-        return f"/community_static/{community}/theme.css"
+        return f"/community_static/{values.get('community', '')}/theme.css"
     if endpoint == "page_view":
-        subpath = values.get("subpath", "")
-        return f"/page/{subpath}"
+        return f"/page/{values.get('subpath', '')}"
     return "/"
 
 env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
 env.globals["url_for"] = fake_url_for
 template = env.get_template("page.html")
+
+def slugify(text: str) -> str:
+    text = text.strip().lower()
+    text = re.sub(r"[^\w\s-]", "", text, flags=re.UNICODE)
+    return re.sub(r"[-\s]+", "-", text).strip("-")
 
 def build_tree(dir_path: Path, base_path: Path):
     tree = []
@@ -37,8 +40,7 @@ def build_tree(dir_path: Path, base_path: Path):
     files = [i for i in items if i.endswith(".md")]
 
     for folder in folders:
-        folder_full_path = dir_path / folder
-        sub_tree = build_tree(folder_full_path, base_path)
+        sub_tree = build_tree(dir_path / folder, base_path)
         tree.append({
             "type": "folder",
             "name": folder.replace("_", " "),
@@ -46,10 +48,8 @@ def build_tree(dir_path: Path, base_path: Path):
         })
 
     for file in files:
-        file_full_path = dir_path / file
-        rel_path = file_full_path.relative_to(base_path).as_posix()
+        rel_path = (dir_path / file).relative_to(base_path).as_posix()
         url_path = str(Path(rel_path).with_suffix(""))
-
         tree.append({
             "type": "file",
             "name": file.replace(".md", "").replace("_", " "),
@@ -66,9 +66,38 @@ def parse_wiki_links(html_content: str) -> str:
             target, label = val.split("|", 1)
         else:
             target, label = val, val
-        target = target.strip().replace(" ", "_")
-        return f'<a href="/page/{target}">{label.strip()}</a>'
+
+        target = target.strip()
+        label = label.strip()
+
+        # Обработка внутристраничных якорей вида [[#Раздел]] или [[#Раздел|Текст]]
+        if target.startswith("#"):
+            anchor = slugify(target.lstrip("#"))
+            return f'<a href="#{anchor}">{label}</a>'
+
+        # Ссылка с якорем на другую страницу вида [[Page#Раздел]]
+        if "#" in target:
+            page, anchor = target.split("#", 1)
+            page_slug = page.strip().replace(" ", "_")
+            anchor_slug = slugify(anchor)
+            return f'<a href="/page/{page_slug}#{anchor_slug}">{label}</a>'
+
+        target_slug = target.replace(" ", "_")
+        return f'<a href="/page/{target_slug}">{label}</a>'
+
     return re.sub(pattern, replace, html_content)
+
+def inject_header_anchors(html_content: str) -> str:
+    header_pattern = re.compile(r"<h([1-6])(.*?)>(.*?)</h\1>", re.DOTALL)
+
+    def replace(match):
+        level, attrs, title = match.groups()
+        clean_title = re.sub(r"<[^>]+>", "", title)
+        anchor_id = slugify(clean_title)
+        clean_attrs = re.sub(r'\s*id="[^"]*"', "", attrs)
+        return f'<h{level} id="{anchor_id}"{clean_attrs}>{title}</h{level}>'
+
+    return header_pattern.sub(replace, html_content)
 
 def render_page(subpath: str, sidebar_tree: list) -> str:
     file_path = PAGES_DIR / f"{subpath}.md"
@@ -83,8 +112,9 @@ def render_page(subpath: str, sidebar_tree: list) -> str:
 
     html_content = markdown2.markdown(
         raw_md,
-        extras=["fenced-code-blocks", "tables", "header-ids", "strike", "task_lists"]
+        extras=["fenced-code-blocks", "tables", "strike", "task_lists"]
     )
+    html_content = inject_header_anchors(html_content)
     html_content = parse_wiki_links(html_content)
 
     rel_parts = Path(subpath).parts

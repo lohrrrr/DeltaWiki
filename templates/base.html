@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}DeltaWiki{% endblock %}</title>
+  <meta name="description" content="{{ description | e }}">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ page_title | e }}">
+  <meta property="og:description" content="{{ description | e }}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ page_title | e }}">
+  <meta name="twitter:description" content="{{ description | e }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
   {% if custom_theme %}
   <link rel="stylesheet" href="{{ custom_theme }}">

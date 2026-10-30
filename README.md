@@ -7,6 +7,7 @@ OpenWIKI is a lightweight Flask-based wiki engine that renders Markdown files fr
 - Simple Flask app serving `.md` pages from `pages/`
 - Sidebar navigation generated from the directory tree
 - Markdown rendering with `markdown2`
+- Social sharing previews generated from each page's first `#` heading and first 100 characters of its text
 - Wiki-style links using `[[Page Name]]` or `[[Page|Label]]`
 - Custom category theme support for pages under `pages/<something>/theme.css`
 

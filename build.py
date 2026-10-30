@@ -2,6 +2,7 @@ import os
 import re
 import shutil
 import unicodedata
+from html.parser import HTMLParser
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 import markdown2
@@ -99,6 +100,46 @@ def inject_header_anchors(html_content: str) -> str:
 
     return header_pattern.sub(replace, html_content)
 
+class PageMetadataParser(HTMLParser):
+    BLOCK_TAGS = {"br", "div", "h1", "h2", "h3", "h4", "h5", "h6", "li", "p", "tr"}
+
+    def __init__(self):
+        super().__init__()
+        self.title_parts = []
+        self.description_parts = []
+        self.in_first_h1 = False
+        self.found_h1 = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "h1" and not self.found_h1:
+            self.found_h1 = True
+            self.in_first_h1 = True
+        elif tag in self.BLOCK_TAGS and not self.in_first_h1:
+            self.description_parts.append(" ")
+
+    def handle_endtag(self, tag):
+        if tag == "h1" and self.in_first_h1:
+            self.in_first_h1 = False
+        elif tag in self.BLOCK_TAGS and not self.in_first_h1:
+            self.description_parts.append(" ")
+
+    def handle_data(self, data):
+        if self.in_first_h1:
+            self.title_parts.append(data)
+        else:
+            self.description_parts.append(data)
+
+    @staticmethod
+    def normalized_text(parts):
+        return " ".join("".join(parts).split())
+
+def extract_page_metadata(html_content: str, fallback_title: str):
+    parser = PageMetadataParser()
+    parser.feed(html_content)
+    title = parser.normalized_text(parser.title_parts) or fallback_title
+    description = parser.normalized_text(parser.description_parts)[:100].strip()
+    return title, description
+
 def render_page(subpath: str, sidebar_tree: list) -> str:
     file_path = PAGES_DIR / f"{subpath}.md"
     if not file_path.exists() and (PAGES_DIR / subpath).is_dir():
@@ -116,6 +157,10 @@ def render_page(subpath: str, sidebar_tree: list) -> str:
     )
     html_content = inject_header_anchors(html_content)
     html_content = parse_wiki_links(html_content)
+    page_title, description = extract_page_metadata(
+        html_content,
+        Path(subpath).name.replace("_", " ")
+    )
 
     rel_parts = Path(subpath).parts
     custom_theme = None
@@ -129,6 +174,8 @@ def render_page(subpath: str, sidebar_tree: list) -> str:
         content=html_content,
         tree=sidebar_tree,
         title=Path(subpath).name.replace("_", " "),
+        page_title=page_title,
+        description=description,
         custom_theme=custom_theme
     )
 
